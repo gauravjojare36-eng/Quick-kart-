@@ -1,0 +1,150 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "A user of the STAYRAW application",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string" },
+        "name": { "type": "string" },
+        "email": { "type": "string", "format": "email" },
+        "role": { "type": "string", "enum": ["user", "admin"] },
+        "addresses": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "preferences": {
+          "type": "object",
+          "properties": {
+            "emailNotifications": { "type": "boolean" },
+            "orderUpdates": { "type": "boolean" }
+          }
+        },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["uid", "name", "email", "role", "createdAt"]
+    },
+    "Product": {
+      "title": "Product",
+      "description": "An e-commerce product",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string" },
+        "description": { "type": "string" },
+        "price": { "type": "number" },
+        "discountPrice": { "type": "number" },
+        "stock": { "type": "number" },
+        "category": { "type": "string" },
+        "images": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "rating": { "type": "number" },
+        "reviewsCount": { "type": "number" },
+        "isTrending": { "type": "boolean" },
+        "tags": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["title", "description", "price", "stock", "category", "images", "createdAt"]
+    },
+    "Category": {
+      "title": "Category",
+      "description": "A product category",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "image": { "type": "string" }
+      },
+      "required": ["name"]
+    },
+    "Order": {
+      "title": "Order",
+      "description": "A customer order",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "customerName": { "type": "string" },
+        "phoneNumber": { "type": "string" },
+        "fullAddress": { "type": "string" },
+        "zipCode": { "type": "string" },
+        "items": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "productId": { "type": "string" },
+              "quantity": { "type": "number" },
+              "price": { "type": "number" }
+            }
+          }
+        },
+        "totalAmount": { "type": "number" },
+        "subtotal": { "type": "number" },
+        "gstAmount": { "type": "number" },
+        "deliveryCharges": { "type": "number" },
+        "discountAmount": { "type": "number" },
+        "status": { "type": "string", "enum": ["Pending", "Shipped", "Delivered", "Cancelled", "Return Requested", "Returned", "Return Rejected"] },
+        "deliveredAt": { "type": "string", "format": "date-time" },
+        "returnRequestedAt": { "type": "string", "format": "date-time" },
+        "shippingAddress": { "type": "string" },
+        "paymentMethod": { "type": "string", "enum": ["COD"] },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "customerName", "phoneNumber", "fullAddress", "zipCode", "items", "totalAmount", "status", "shippingAddress", "paymentMethod", "createdAt"]
+    },
+    "Coupon": {
+      "title": "Coupon",
+      "description": "A discount coupon",
+      "type": "object",
+      "properties": {
+        "code": { "type": "string" },
+        "discountPercentage": { "type": "number" },
+        "maxDiscount": { "type": "number" },
+        "expiryDate": { "type": "string", "format": "date-time" },
+        "usageLimit": { "type": "number" }
+      },
+      "required": ["code", "discountPercentage", "expiryDate"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": { "$ref": "#/entities/User" },
+      "description": "User profiles"
+    },
+    "/products/{productId}": {
+      "schema": { "$ref": "#/entities/Product" },
+      "description": "Product catalog"
+    },
+    "/categories/{categoryId}": {
+      "schema": { "$ref": "#/entities/Category" },
+      "description": "Product categories"
+    },
+    "/orders/{orderId}": {
+      "schema": { "$ref": "#/entities/Order" },
+      "description": "Customer orders"
+    },
+    "/coupons/{couponId}": {
+      "schema": { "$ref": "#/entities/Coupon" },
+      "description": "Discount coupons"
+    },
+    "/vip_products/{productId}": {
+      "schema": { "$ref": "#/entities/Product" },
+      "description": "VIP bulk products"
+    },
+    "/vip_categories/{categoryId}": {
+      "schema": { "$ref": "#/entities/Category" },
+      "description": "VIP product categories"
+    },
+    "/vip_banners/{bannerId}": {
+      "schema": { "type": "object", "properties": { "title": { "type": "string" }, "imageUrl": { "type": "string" }, "isActive": { "type": "boolean" } } },
+      "description": "VIP store banners"
+    },
+    "/vip_orders/{orderId}": {
+      "schema": { "$ref": "#/entities/Order" },
+      "description": "VIP customer orders"
+    }
+  }
+}
