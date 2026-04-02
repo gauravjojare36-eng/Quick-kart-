@@ -1,8 +1,103 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    match /{document=**} {
-      allow read, write: if true;
+
+    // ===============================================================
+    // Helper Functions
+    // ===============================================================
+    function isAuthenticated() { return request.auth != null; }
+    function isOwner(userId) { return isAuthenticated() && request.auth.uid == userId; }
+    function isAdmin() {
+      return isAuthenticated() &&
+        (get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin' ||
+          (request.auth.token.email == "shamsunderjojare@gmail.com" && request.auth.token.email_verified == true));
+    }
+    function uidNotModified() { return request.resource.data.uid == resource.data.uid; }
+
+    // ===============================================================
+    // Rules
+    // ===============================================================
+    
+    // Users
+    match /users/{userId} {
+      allow read: if isOwner(userId) || isAdmin();
+      allow update: if isOwner(userId) && uidNotModified();
+      allow create: if isOwner(userId);
+    }
+
+    // Products
+    match /products/{productId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /vip_products/{productId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // Orders
+    match /orders/{orderId} {
+      allow read: if isOwner(resource.data.userId) || isAdmin();
+      allow create: if isAuthenticated() && request.resource.data.userId == request.auth.uid;
+      allow update: if isAdmin();
+    }
+
+    match /vip_orders/{orderId} {
+      allow read: if isOwner(resource.data.userId) || isAdmin();
+      allow create: if isAuthenticated() && request.resource.data.userId == request.auth.uid;
+      allow update: if isAdmin();
+    }
+
+    // Categories
+    match /categories/{categoryId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /vip_categories/{categoryId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // Coupons
+    match /coupons/{couponId} {
+      allow read: if isAuthenticated();
+      allow write: if isAdmin();
+    }
+
+    // Banners
+    match /banners/{bannerId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    match /vip_banners/{bannerId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // Home Data
+    match /home_data {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    match /home_data/{docId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    match /vip_home_data {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    match /vip_home_data/{docId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    
+    // Notifications
+    match /notifications/{notificationId} {
+      allow read: if isOwner(resource.data.userId);
+      allow write: if isAdmin();
     }
   }
 }

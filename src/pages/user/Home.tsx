@@ -62,7 +62,8 @@ export default function Home() {
         setBanners(bannersSnap.docs.map(doc => ({ id: doc.id, ...doc.data() })) as Banner[]);
         setCategories(categoriesSnap.docs.map(doc => ({ id: doc.id, ...doc.data() })) as Category[]);
       } catch (error) {
-        handleFirestoreError(error, OperationType.GET, `${prefix}home_data`);
+        console.error("Error fetching home data:", error);
+        handleFirestoreError(error, OperationType.GET, `${prefix}products/banners/categories`);
       } finally {
         setLoading(false);
       }
